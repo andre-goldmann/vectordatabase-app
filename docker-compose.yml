@@ -8,6 +8,9 @@ services:
   #  depends_on:
   #    - "standalone"
   #    - "fastapi"
+    labels: # new
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`fastapi.localhost`)"
 
   fastapi:
     build: ./fastapi
@@ -58,6 +61,15 @@ services:
     depends_on:
       - "etcd"
       - "minio"
+
+  traefik: # new
+    image: traefik:latest
+    ports:
+      - 8008:80
+      - 8081:8080
+    volumes:
+      - "./traefik.dev.toml:/etc/traefik/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
 networks:
   default:
