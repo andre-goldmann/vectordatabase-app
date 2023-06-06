@@ -5,18 +5,17 @@ services:
     build: ./app
     ports:
       - "80:80"
-  #  depends_on:
-  #    - "standalone"
-  #    - "fastapi"
-
+  # Security, do we need to secure this?
+  # yes we need if we are going to use pinecone/openai here
+  #https://testdriven.io/blog/fastapi-jwt-auth/
+  #https://dev.to/spaceofmiah/implementing-authorization-in-fastapi-a-step-by-step-guide-for-securing-your-web-applications-3b1l
+  #https://github: com/testdrivenio/fastapi-docker-traefik:
   fastapi:
     build: ./fastapi
     ports:
       - "9081:9081"
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/fastapi:/var/lib/fastapi
-    networks:
-      - milvus
 
   etcd:
     container_name: milvus-etcd

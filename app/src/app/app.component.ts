@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {SentenceService} from "./sentence.service";
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,17 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'app';
+  constructor(private sentenceService: SentenceService) {
+  }
+
+  callSentenceService() {
+    this.sentenceService.translate("Hello World")
+      .subscribe(
+        {
+          next: value => {
+            console.log(value)
+          }
+        }
+      );
+  }
 }

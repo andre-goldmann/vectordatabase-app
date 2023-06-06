@@ -1,5 +1,3 @@
-
-
 ### STAGE 3: Build ###
 FROM maven:3.8.2-eclipse-temurin-17
 

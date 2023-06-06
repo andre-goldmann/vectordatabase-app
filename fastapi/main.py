@@ -1,26 +1,51 @@
-from typing import Union
-
-from fastapi import FastAPI
+import jwt
 import torch
+from fastapi import FastAPI
+from fastapi import Header
+from fastapi.middleware.cors import CORSMiddleware
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 
+JWT_SECRET = "secret" # IRL we should NEVER hardcode the secret: it should be an evironment variable!!!
+JWT_ALGORITHM = "HS256"
+
 app = FastAPI()
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/translator/{modelname}/")
-def translate(modelname: str, text: str):
+def translate(modelname: str, text: str, authorization: str = Header(None)):
+
+    try:
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
+
     model = getModel(modelname)
 
     # create the query vector
     return model.encode(text).tolist()
 
 @app.get("/splitter/{text}")
-def splitText(text: str):
+def splitText(text: str, authorization: str = Header(None)):
+
+    try:
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
+
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1536,
         chunk_overlap=200,
@@ -58,3 +83,10 @@ def getModel(modelname):
         return SentenceTransformer(modelname)
     else:
         raise Exception("Unknown model: " + modelname)
+
+def secure(token):
+    # if we want to sign/encrypt the JSON object: {"hello": "world"}, we can do it as follows
+    # encoded = jwt.encode({"hello": "world"}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    decoded_token = jwt.decode(token, JWT_SECRET, algorithms=JWT_ALGORITHM)
+    # this is often used on the client side to encode the user's email address or other properties
+    return decoded_token
