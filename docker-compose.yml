@@ -8,9 +8,6 @@ services:
   #  depends_on:
   #    - "standalone"
   #    - "fastapi"
-    labels: # new
-      - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`fastapi.localhost`)"
 
   fastapi:
     build: ./fastapi
@@ -18,6 +15,8 @@ services:
       - "9081:9081"
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/fastapi:/var/lib/fastapi
+    networks:
+      - milvus
 
   etcd:
     container_name: milvus-etcd
@@ -61,15 +60,6 @@ services:
     depends_on:
       - "etcd"
       - "minio"
-
-  traefik: # new
-    image: traefik:latest
-    ports:
-      - 8008:80
-      - 8081:8080
-    volumes:
-      - "./traefik.dev.toml:/etc/traefik/traefik.toml"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
 networks:
   default:
