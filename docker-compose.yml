@@ -5,6 +5,17 @@ services:
     build: ./app
     ports:
       - "80:80"
+    env_file:
+      - variables.env
+
+  backend:
+    build: ./backend
+    ports:
+      - "7081:7081"
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/backend:/var/lib/backend
+    env_file:
+      - variables.env
   # Security, do we need to secure this?
   # yes we need if we are going to use pinecone/openai here
   #https://testdriven.io/blog/fastapi-jwt-auth/
@@ -16,6 +27,8 @@ services:
       - "9081:9081"
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/fastapi:/var/lib/fastapi
+    env_file:
+      - variables.env
 
   etcd:
     container_name: milvus-etcd

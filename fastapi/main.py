@@ -5,9 +5,10 @@ from fastapi import Header
 from fastapi.middleware.cors import CORSMiddleware
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
+import os
 
-JWT_SECRET = "secret" # IRL we should NEVER hardcode the secret: it should be an evironment variable!!!
-JWT_ALGORITHM = "HS256"
+JWT_SECRET = os.getenv('JWT_SECRET')
+JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
 
 app = FastAPI()
 origins = ["*"]
