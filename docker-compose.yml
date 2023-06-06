@@ -11,8 +11,10 @@ services:
 
   fastapi:
     build: ./fastapi
-    ports:
-      - "9081:9081"
+    environment:
+      - PORT=9081
+    #ports:
+    #  - "9081:9081"
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/fastapi:/var/lib/fastapi
 
