@@ -62,8 +62,8 @@ public class SitesController {
     @GetMapping("milvus/search")
     public String milvusSearch(
             final String searchedDomain){
-        //this.milvusService.searchWithVector(searchedDomain);
-        this.milvusService.searchDomainByExpression(searchedDomain);
+        this.milvusService.searchWithVector(searchedDomain);
+        //this.milvusService.searchDomainByExpression(searchedDomain);
         return "OK";
     }
 

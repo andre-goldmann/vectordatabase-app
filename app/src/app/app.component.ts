@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {SentenceService} from "./sentence.service";
+import {BackendService} from "./backend.service";
 
 @Component({
   selector: 'app-root',
@@ -8,11 +9,23 @@ import {SentenceService} from "./sentence.service";
 })
 export class AppComponent {
   title = 'app';
-  constructor(private sentenceService: SentenceService) {
+  constructor(private sentenceService: SentenceService,
+              private backendService:BackendService) {
   }
 
   callSentenceService() {
     this.sentenceService.translate("Hello World")
+      .subscribe(
+        {
+          next: value => {
+            console.log(value)
+          }
+        }
+      );
+  }
+
+  callBackendService() {
+    this.backendService.search("Hello World")
       .subscribe(
         {
           next: value => {

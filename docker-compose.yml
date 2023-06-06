@@ -2,6 +2,7 @@ version: '3.5'
 
 services:
   nginx:
+    container_name: nginx-server
     build: ./app
     ports:
       - "80:80"
@@ -9,6 +10,7 @@ services:
       - variables.env
 
   backend:
+    container_name: backend-server
     build: ./backend
     ports:
       - "7081:7081"
@@ -22,6 +24,7 @@ services:
   #https://dev.to/spaceofmiah/implementing-authorization-in-fastapi-a-step-by-step-guide-for-securing-your-web-applications-3b1l
   #https://github: com/testdrivenio/fastapi-docker-traefik:
   fastapi:
+    container_name: fastapi-server
     build: ./fastapi
     ports:
       - "9081:9081"
