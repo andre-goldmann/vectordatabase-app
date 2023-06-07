@@ -9,7 +9,7 @@ services:
   #https://github: com/testdrivenio/fastapi-docker-traefik:
   fastapi:
     container_name: fastapi-server
-    build: ./fastapi
+    build: sentenceapi
     ports:
       - "9081:9081"
     volumes:

@@ -9,27 +9,54 @@ services:
     env_file:
       - variables.env
 
-  backend:
-    container_name: backend-server
-    build: ./backend
+  api:
+    container_name: api
+    build: ./api
     ports:
-      - "7081:7081"
+      - "4081:4081"
     volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/backend:/var/lib/backend
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/api:/var/lib/api
     env_file:
       - variables.env
+    depends_on:
+      - "milvusbackend"
+      - "sentenceapi"
+      - "pineconebackend"
+
+  milvusbackend:
+    container_name: milvus-backend
+    build: ./milvus
+    ports:
+      - "5081:5081"
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvusbackend:/var/lib/milvusbackend
+    env_file:
+      - variables.env
+    depends_on:
+      - "standalone"
+
   # Security, do we need to secure this?
   # yes we need if we are going to use pinecone/openai here
   #https://testdriven.io/blog/fastapi-jwt-auth/
   #https://dev.to/spaceofmiah/implementing-authorization-in-fastapi-a-step-by-step-guide-for-securing-your-web-applications-3b1l
   #https://github: com/testdrivenio/fastapi-docker-traefik:
-  fastapi:
-    container_name: fastapi-server
-    build: ./fastapi
+  sentenceapi:
+    container_name: sentence-api-server
+    build: ./sentenceapi
     ports:
-      - "9081:9081"
+      - "6081:6081"
     volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/fastapi:/var/lib/fastapi
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/sentenceapi:/var/lib/sentenceapi
+    env_file:
+      - variables.env
+
+  pineconebackend:
+    container_name: pinecone-backend
+    build: ./pinecone
+    ports:
+      - "7081:7081"
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/pineconebackend:/var/lib/pineconebackend
     env_file:
       - variables.env
 

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {SentenceService} from "./sentence.service";
-import {BackendService} from "./backend.service";
+import {MilvusService} from "./milvus.service";
+import {PineconeService} from "./pinecone.service";
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,8 @@ import {BackendService} from "./backend.service";
 export class AppComponent {
   title = 'app';
   constructor(private sentenceService: SentenceService,
-              private backendService:BackendService) {
+              private milvusService:MilvusService,
+              private pineconeService:PineconeService) {
   }
 
   callSentenceService() {
@@ -25,8 +27,25 @@ export class AppComponent {
   }
 
   callBackendService() {
-    this.backendService.search("Hello World")
+    this.milvusService.search("Hello World")
       .subscribe(
+        {
+          next: value => {
+            console.log(value)
+          }
+        }
+      );
+  }
+
+  callPinceService() {
+      this.pineconeService.getIndexes().subscribe(
+        {
+          next: value => {
+            console.log(value)
+          }
+        }
+      );
+      this.pineconeService.getModels().subscribe(
         {
           next: value => {
             console.log(value)

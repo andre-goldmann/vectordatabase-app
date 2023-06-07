@@ -89,7 +89,7 @@ volumes
 backend/*.ctxt
 
 # Mobile Tools for Java (J2ME)
-backend/.mtj.tmp/
+milvus/.mtj.tmp/
 
 # Package Files #
 backend/*.jar
@@ -101,41 +101,75 @@ backend/*.tar.gz
 backend/*.rar
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-backend/hs_err_pid*
-backend/replay_pid*
+milvus/hs_err_pid*
+milvus/replay_pid*
 
-backend/HELP.md
-backend/target/
-backend/!.mvn/wrapper/maven-wrapper.jar
-backend/!**/src/main/**/target/
-backend/!**/src/test/**/target/
+milvus/HELP.md
+milvus/target/
+milvus/!.mvn/wrapper/maven-wrapper.jar
+milvus/!**/src/main/**/target/
+milvus/!**/src/test/**/target/
 
 ### STS ###
-backend/.apt_generated
-backend/.classpath
-backend/.factorypath
-backend/.project
-backend/.settings
-backend/.springBeans
-backend/.sts4-cache
+milvus/.apt_generated
+milvus/.classpath
+milvus/.factorypath
+milvus/.project
+milvus/.settings
+milvus/.springBeans
+milvus/.sts4-cache
 
 ### IntelliJ IDEA ###
-backend/.idea
+milvus/.idea
 backend/*.iws
 backend/*.iml
 backend/*.ipr
 
 ### NetBeans ###
-backend/nbproject/private/
-backend/nbbuild/
-backend/dist/
-backend/nbdist/
-backend/.nb-gradle/
-backend/build/
-backend/!**/src/main/**/build/
-backend/!**/src/test/**/build/
+milvus/nbproject/private/
+milvus/nbbuild/
+milvus/dist/
+milvus/nbdist/
+milvus/.nb-gradle/
+milvus/build/
+milvus/!**/src/main/**/build/
+milvus/!**/src/test/**/build/
 
 ### VS Code ###
-backend/.vscode/
+milvus/.vscode/
 
-backend/data
+milvus/data
+
+api/HELP.md
+api/target/
+api/!.mvn/wrapper/maven-wrapper.jar
+api/!**/src/main/**/target/
+api/!**/src/test/**/target/
+
+### STS ###
+api/.apt_generated
+api/.classpath
+api/.factorypath
+api/.project
+api/.settings
+api/.springBeans
+api/.sts4-cache
+
+### IntelliJ IDEA ###
+api/.idea
+api/*.iws
+api/*.iml
+api/*.ipr
+
+### NetBeans ###
+api/nbproject/private/
+api/nbbuild/
+api/dist/
+api/nbdist/
+api/.nb-gradle/
+api/build/
+api/!**/src/main/**/build/
+api/!**/src/test/**/build/
+
+### VS Code ###
+api/.vscode/

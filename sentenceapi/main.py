@@ -1,8 +1,8 @@
 import jwt
 import torch
-from fastapi import FastAPI
-from fastapi import Header
-from fastapi.middleware.cors import CORSMiddleware
+from sentenceapi import FastAPI
+from sentenceapi import Header
+from sentenceapi.middleware.cors import CORSMiddleware
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 import os
