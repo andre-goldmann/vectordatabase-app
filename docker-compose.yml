@@ -21,8 +21,8 @@ services:
     env_file:
       - variables.env
     depends_on:
-      - "milvusbackend"
       - "sentenceapi"
+      - "milvusbackend"
       - "pineconebackend"
 
   milvusbackend:
@@ -36,6 +36,7 @@ services:
       - variables.env
     depends_on:
       - "standalone"
+      - "sentenceapi"
 
   # Security, do we need to secure this?
   # yes we need if we are going to use pinecone/openai here

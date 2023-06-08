@@ -18,12 +18,12 @@ public class FastApiConnectController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${api.url}")
-    private String apiUrl;
+    @Value("${sentenceapi.url}")
+    private String sentenceapiUrl;
 
     public List<Float> calculateSenteceVectors(final String sentence){
         final String fooResourceUrl
-                = this.apiUrl + "/sentences/translator/all-MiniLM-L6-v2/text={text}";
+                = this.sentenceapiUrl + "/sentences/translator/all-MiniLM-L6-v2/text={text}";
 
         final DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
