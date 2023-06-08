@@ -73,7 +73,7 @@ public class CsvMataolnApplication implements CommandLineRunner {
 					if (!dateTimeParseExceptions.isEmpty()) {
 						dateTimeParseExceptions.forEach(System.out::println);
 					}
-					System.out.println(counter + " lines read!");
+					log.info(counter + " lines read!");
 				}
 			}
 		}else

@@ -3,24 +3,21 @@ package de.goldman.csv.mataoln.infrastructure.csv;
 import com.opencsv.CSVParser;
 import de.goldman.csv.mataoln.domain.model.SiteEntity;
 import de.goldman.csv.mataoln.domain.model.SiteEntityRepository;
-import de.goldman.csv.mataoln.infrastructure.milvus.LoadGoogleNewsModelWithReflection;
 import de.goldman.csv.mataoln.infrastructure.milvus.MilvusService;
 import de.goldman.csv.mataoln.infrastructure.rest.FastApiConnectController;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.goldman.csv.mataoln.infrastructure.milvus.MilvusService.COLLECTION_NAME;
@@ -58,7 +55,7 @@ public class LineParser {
             counter.incrementAndGet();
 
             if (counter.get() % 20000 == 0 && parsed.length > 2) {
-                System.out.println(counter + " lines read!");
+                log.info(counter + " lines read!");
                 //System.out.println(parsed[0] + ", " + parsed[1] + ", " + parsed[2] + ", " + parsed[3] + ", " + parsed[4] + ", " + parsed[5]);
                 //System.out.println("Split:" + split.length + ", parsed: " + parsed.length);
                 //					System.out.println("Actual content:" + split[0] + ", " + split[1]);

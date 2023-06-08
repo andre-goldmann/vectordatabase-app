@@ -7,13 +7,13 @@ services:
   #https://testdriven.io/blog/fastapi-jwt-auth/
   #https://dev.to/spaceofmiah/implementing-authorization-in-fastapi-a-step-by-step-guide-for-securing-your-web-applications-3b1l
   #https://github: com/testdrivenio/fastapi-docker-traefik:
-  fastapi:
-    container_name: fastapi-server
-    build: sentenceapi
+  sentenceapi:
+    container_name: sentence-api-server
+    build: ./sentenceapi
     ports:
-      - "9081:9081"
+      - "6081:6081"
     volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/fastapi:/var/lib/fastapi
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/sentenceapi:/var/lib/sentenceapi
     env_file:
       - variables.env
 

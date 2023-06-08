@@ -181,3 +181,4 @@ pinecone/.env
 /pinecone/files.db
 /pinecone/uploadLebenslauf-englisch.docx
 /pinecone/uploadsvelte-succinctly.pdf
+/milvus/logs/

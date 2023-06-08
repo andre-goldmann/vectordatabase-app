@@ -13,12 +13,14 @@ import io.milvus.param.dml.SearchParam;
 import io.milvus.param.index.CreateIndexParam;
 import io.milvus.response.QueryResultsWrapper;
 import io.milvus.response.SearchResultsWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 import java.util.*;
 
+@Slf4j
 @Service
 public class MilvusService {
     public static final String COLLECTION_NAME = "book";
@@ -157,7 +159,7 @@ public class MilvusService {
     }
 
     public R<RpcStatus> loadCollection() {
-        System.out.println("========== loadCollection() ==========");
+        log.info("========== loadCollection() ==========");
         R<RpcStatus> response = milvusClient.loadCollection(LoadCollectionParam.newBuilder()
                 .withCollectionName(COLLECTION_NAME)
                 .build());
@@ -197,7 +199,7 @@ public class MilvusService {
 
     public void searchDomainByExpression(String expr) {
         loadCollection();
-        System.out.println("========== searchFace() ==========");
+        log.info("========== searchFace() ==========");
         long begin = System.currentTimeMillis();
 
         final List<String> query_output_fields = Arrays.asList(DOMAIN_FIELD, "employees", "social");
@@ -213,11 +215,11 @@ public class MilvusService {
 
         long end = System.currentTimeMillis();
         long cost = (end - begin);
-        System.out.println("Search time cost: " + cost + "ms");
+        log.info("Search time cost: " + cost + "ms");
 
         QueryResultsWrapper wrapperQuery = new QueryResultsWrapper(respQuery.getData());
-        System.out.println(wrapperQuery.getFieldWrapper(DOMAIN_FIELD).getFieldData());
-        System.out.println(wrapperQuery.getFieldWrapper( "employees").getFieldData());
+        log.info(wrapperQuery.getFieldWrapper(DOMAIN_FIELD).getFieldData() + "");
+        log.info(wrapperQuery.getFieldWrapper( "employees").getFieldData() + "");
         milvusClient.releaseCollection(
                 ReleaseCollectionParam.newBuilder()
                         .withCollectionName(COLLECTION_NAME)
@@ -228,7 +230,7 @@ public class MilvusService {
     public R<SearchResults> searchWithVector(String expr) {
         // loadCollection() must be called before search()
         loadCollection();
-        System.out.println("========== searchFace() ==========");
+        log.info("========== searchFace() ==========");
         long begin = System.currentTimeMillis();
 
         List<String> outFields = Arrays.asList(DOMAIN_FIELD, "employees", "social");//Collections.singletonList(DOMAIN_FIELD);
@@ -256,7 +258,7 @@ public class MilvusService {
         R<SearchResults> response = milvusClient.search(searchParam);
         long end = System.currentTimeMillis();
         long cost = (end - begin);
-        System.out.println("Search time cost: " + cost + "ms");
+        log.info("Search time cost: " + cost + "ms");
 
         handleResponseStatus(response);
         SearchResultsWrapper wrapper = new SearchResultsWrapper(response.getData().getResults());
@@ -267,7 +269,7 @@ public class MilvusService {
             System.out.println("Output field data for No." + i);
             //System.out.println(wrapper.getFieldData(DOMAIN_FIELD, i));
 
-            System.out.println(wrapper.getFieldData(DOMAIN_FIELD, i) + ": " +
+            log.info(wrapper.getFieldData(DOMAIN_FIELD, i) + ": " +
                     "employees=" + wrapper.getFieldData("employees" ,i)+
                     ", social=" + wrapper.getFieldData("social" ,i));
         }
@@ -279,7 +281,7 @@ public class MilvusService {
     }
 
     public R<ShowCollectionsResponse> showCollections() {
-        System.out.println("========== showCollections() ==========");
+        log.info("========== showCollections() ==========");
         R<ShowCollectionsResponse> response = milvusClient.showCollections(ShowCollectionsParam.newBuilder()
                 .build());
         handleResponseStatus(response);
@@ -295,7 +297,7 @@ public class MilvusService {
     }
 
     public boolean hasCollection() {
-        System.out.println("========== hasCollection() ==========");
+        log.info("========== hasCollection() ==========");
         R<Boolean> response = milvusClient.hasCollection(HasCollectionParam.newBuilder()
                 .withCollectionName(COLLECTION_NAME)
                 .build());
