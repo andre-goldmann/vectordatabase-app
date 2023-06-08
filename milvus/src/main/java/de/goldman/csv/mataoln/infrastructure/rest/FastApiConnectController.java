@@ -1,6 +1,7 @@
 package de.goldman.csv.mataoln.infrastructure.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,9 +18,12 @@ public class FastApiConnectController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Value("${api.url}")
+    private String apiUrl;
+
     public List<Float> calculateSenteceVectors(final String sentence){
         final String fooResourceUrl
-                = "http://localhost:9081/translator/all-MiniLM-L6-v2/?text={text}";
+                = this.apiUrl + "/sentences/translator/all-MiniLM-L6-v2/text={text}";
 
         final DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
