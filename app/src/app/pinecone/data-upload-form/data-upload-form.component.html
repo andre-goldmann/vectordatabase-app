@@ -1,0 +1,99 @@
+<div class="relative flex flex-col justify-center overflow-hidden">
+  <div class="w-full p-6 m-auto bg-transparent rounded-md shadow-md lg:max-w-xl">
+  <div class="space-y-4">
+      <div style="text-align: left">
+        <input type="checkbox" class="checkbox checkbox-sm" #chkEnable [(ngModel)]="isFileUpload" (change)="disableUrlUpload(chkEnable.checked)"/>
+        <label>Use URL</label>
+      </div>
+      <div>
+        <div>
+          Examples:
+          https://s3.amazonaws.com/ebooks.syncfusion.com/downloads/svelte-succinctly/svelte-succinctly.pdf
+          https://www.lcg.ufrj.br/nodejs/books/svelte-handbook.pdf
+        </div>
+        <input type="text" placeholder="URL" class="w-full input input-bordered input-sm"
+               [(ngModel)]="url" [disabled]="isFileUpload" name="url"/>
+      </div>
+      <div style="background-color: yellow">
+        <input type="file" #file (change)="onFilesAdded()" multiple required
+               class="file-input file-input-bordered file-input-sm" [disabled]="!isFileUpload"
+        style="width: 100%"/>
+      </div>
+      <div>
+        <ul>
+          <li *ngFor="let file of files">
+
+            <div class="grid-container">
+              <div class="grid-item">
+                <div class="card card-compact w-full bg-base-100 shadow-xl">
+                  <div class="card-body">
+                    <div class="card-actions justify-end">
+                      <button class="btn btn-square btn-xs" (click)="deleteFile(file)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                    <div class="card-title">{{file.name}} <button class="btn btn-square loading btn-xs" *ngIf="fileIsLoading(file.name)"></button></div>
+                    <span *ngIf="existsFile(file.name)" style="text-align: left">(allready exists)</span>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </li>
+        </ul>
+      </div>
+
+      <div style="text-align: right">
+        <button class="btn btn-primary" (click)="onSubmit()" [disabled]="uploading">Submit</button>
+      </div>
+  </div>
+  </div>
+</div>
+
+<progress class="progress w-56" *ngIf="uploading"></progress>
+
+<!--div>
+  TODOs:
+  <ul>
+
+    <li>
+      wether load data from url, or from file, not both
+    </li>
+    <li>
+      MetaData verringern, bzw. den Benutzer definieren lassen, vorerst nur Dateiname
+    </li>
+    <li>
+      PrivateGpt
+    </li>
+    <li>
+      wenn der gewünschte Index ein andere als der aktuell gespeicherte was dann?
+    </li>
+    <li>
+      log time of queries to compare the databases
+    </li>
+    <li>
+      Implement search-site
+    </li>
+    <li>
+      implement all pinecone examples
+    </li>
+    <li>
+      register more pinecone accounts, to switch between them
+    </li>
+    <li>
+      do not store plain text data in db???
+      normally search should work like in qa.py
+    </li>
+    <li>csv-import, image-import</li>
+    <li>error handling</li>
+    <li>make download of pinecone-json possible</li>
+    <li>register website like vector-databases.ai</li>
+    <li>search on medium for more examples</li>
+    <li>what examples from huggingfaces can be implemented</li>
+    <li>
+      implement more databases (+examples)
+    </li>
+  </ul>
+</div-->

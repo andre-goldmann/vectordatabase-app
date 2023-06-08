@@ -1,0 +1,17 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-container > div {
+  border: 1px solid grey;
+  text-align: center;
+}
+
+.grid-container :first-child {
+  grid-column: 1 / -1;
+}
+
+.dashboard-card {
+
+}

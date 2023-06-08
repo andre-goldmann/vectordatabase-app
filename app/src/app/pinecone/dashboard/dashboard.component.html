@@ -1,0 +1,8 @@
+<div class="grid-container">
+  <div class="dashboard-card" *ngFor="let card of cards | async" style="min-height: {{card.height}}px">
+    <label class="text-lg font-bold">{{card.title}}</label>
+    <app-index-config-form *ngIf="card.title=='Index-Config'">Config</app-index-config-form>
+    <app-data-upload-form *ngIf="card.title=='Data Upload'"></app-data-upload-form>
+    <app-data-search-form *ngIf="card.title=='Data Queries'"></app-data-search-form>
+  </div>
+</div>

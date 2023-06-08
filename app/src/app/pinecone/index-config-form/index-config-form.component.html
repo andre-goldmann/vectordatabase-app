@@ -1,0 +1,127 @@
+<div class="grid-container">
+  <div class="grid-item">
+    <div class="form-control">
+      <div class="input-group">
+        <input type="checkbox" #chkEnable ngModel (change)="disableField(chkEnable.checked)" [(ngModel)]="checked" class="checkbox checkbox-sm" />
+        <label>Use default settings</label>
+      </div>
+    </div>
+
+    <form [formGroup]="indexForm.indexForm" novalidate>
+      <div class="row">
+        <div class="col">
+          <div>
+            <label class="label">
+              <span class="text-base label-text">Your Api Key</span>
+            </label>
+            <input type="text" placeholder="Your Api Key" formControlName="apikey" class="w-full input input-bordered" required/>
+          </div>
+        </div>
+        <div class="col">
+          <div>
+            <label class="label">
+              <span class="text-base label-text">Model</span>
+            </label>
+            <select class="select w-full max-w-xs" formControlName="modelName" required>
+              <option [ngValue]="null" disabled>DEFAULT-MODEL-NAME</option>
+              <option *ngFor="let model of models$ | async" [ngValue]="model">{{model}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Line 2 -->
+      <div class="row">
+        <div class="col">
+          <div>
+            <label class="label">
+              <span class="text-base label-text">Metric</span>
+            </label>
+            <select class="select w-full max-w-xs" formControlName="metric" required>
+              <option disabled selected>DEFAULT-METRIC</option>
+              <option value="cosine">cosine</option>
+              <option value="dotproduct">dotproduct</option>
+              <option value="euclidean">euclidean</option>
+            </select>
+          </div>
+        </div>
+        <div class="col">
+          <div>
+            <label class="label">
+              <span class="text-base label-text">Index</span>
+            </label>
+            <input type="text" placeholder="Your Index Name" formControlName="indexName" class="w-full input input-bordered" required/>
+          </div>
+        </div>
+      </div>
+      <br>
+      <!-- Line 3 -->
+      <div class="row">
+        <div class="col">
+          <div class="form-control">
+            <div class="input-group">
+              <input type="checkbox" class="checkbox" formControlName="deleteIndex"/>
+              <label>Delete Index</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="grid-item">
+
+    <div *ngIf="indexInfoService.selectedInfo$ | async as inf; else loading">
+      <div *ngIf="inf.error">
+        <div class="alert alert-error shadow-lg">
+          <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{inf.error}}</span>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!inf.error">
+        <div class="grid-container">
+          <div class="grid-item">
+            <div tabindex="0" class="collapse collapse-open border border-base-300 bg-base-100 rounded-box">
+              <div class="collapse-title text-xl font-medium">
+                Dimension
+              </div>
+              <div class="collapse-content">
+                <p>{{inf.dimension}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="grid-item">
+            <div tabindex="0" class="collapse collapse-open border border-base-300 bg-base-100 rounded-box">
+              <div class="collapse-title text-xl font-medium">
+                Vectors
+              </div>
+              <div class="collapse-content">
+                <p>{{inf.total_vector_count}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="grid-item">
+            <div tabindex="0" class="collapse collapse-open border border-base-300 bg-base-100 rounded-box">
+              <div class="collapse-title text-xl font-medium">
+                Fullness
+              </div>
+              <div class="collapse-content">
+                <p>{{inf.index_fullness}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template #loading>
+      <progress class="progress w-56" ></progress>
+    </ng-template>
+
+  </div>
+
+</div>
+
+
+
