@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -18,6 +19,11 @@ import java.util.List;
 @EnableWebSecurity
 @Slf4j
 public class WebSecurityConfig {
+
+    @Bean
+    RestTemplate restTemplate(){
+        return new RestTemplate();
+    }
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http) throws Exception {

@@ -173,3 +173,8 @@ api/!**/src/test/**/build/
 
 ### VS Code ###
 api/.vscode/
+
+sentenceapi/.idea
+sentenceapi/.env
+pinecone/.idea
+pinecone/.env

@@ -1,11 +1,14 @@
 import jwt
 import torch
-from sentenceapi import FastAPI
-from sentenceapi import Header
-from sentenceapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+from fastapi import Header
+from fastapi.middleware.cors import CORSMiddleware
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 JWT_SECRET = os.getenv('JWT_SECRET')
 JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
@@ -20,10 +23,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/translator/{modelname}/")
+@app.get("/translator/")
 def translate(modelname: str, text: str, authorization: str = Header(None)):
 
     try:
+        print(JWT_SECRET)
         print(authorization)
         decoded = secure(authorization)
         # here we can add code to check the user (by email)
@@ -36,7 +40,7 @@ def translate(modelname: str, text: str, authorization: str = Header(None)):
     # create the query vector
     return model.encode(text).tolist()
 
-@app.get("/splitter/{text}")
+@app.get("/splitter/")
 def splitText(text: str, authorization: str = Header(None)):
 
     try:

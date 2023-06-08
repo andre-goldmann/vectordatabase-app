@@ -1,8 +1,5 @@
+import jwt
 import json
-import os
-import sqlite3
-import json
-import os
 import sqlite3
 import traceback
 from datetime import datetime
@@ -12,25 +9,25 @@ from typing import Optional
 from urllib.parse import urlparse
 
 import docx
-import pandas as pd
 import pinecone
-import pytz
 import requests
 import torch
-import uvicorn
-from anyio import create_task_group
 from decouple import config
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Response, status, Depends
+from fastapi import FastAPI, File, UploadFile, HTTPException, Header, Response, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from pinecone import GRPCIndex, DescribeIndexStatsResponse
 from sentence_transformers import SentenceTransformer
-from sklearn.ensemble import RandomForestClassifier
 from tqdm.auto import tqdm
 from typing_extensions import Annotated
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
+JWT_SECRET = os.getenv('JWT_SECRET')
+JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
 
 class QueryResult:
     def __init__(self, id, score, text=''):
@@ -75,14 +72,24 @@ app.add_middleware(
 
 @app.post("/pinecone/uploadfiles/url/")
 async def create_upload_files_url(
-        apiKey: str = Form(...),
-        modelName: str = Form(...),
-        indexName: str = Form(...),
-        environment: str = Form(...),
-        metric: str = Form(...),
-        url: Optional[str] = Form(None),
+        apiKey: str,
+        modelName: str,
+        indexName: str,
+        environment: str,
+        metric: str,
+        url: Optional[str],
+        authorization: str = Header(None),
         con=Depends(get_db)
 ):
+
+    try:
+        print(JWT_SECRET)
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
 
     if "DEFAULT-API-KEY" == apiKey:
         apiKey = config('PINECONE_API_KEY')
@@ -117,19 +124,28 @@ async def create_upload_files_url(
 
     return "OK"
 
-#TODO extra Post für URL
 @app.post("/pinecone/uploadfiles/")
 async def create_upload_files(
         files: Annotated[
             List[UploadFile], File(description="Multiple files as UploadFile")
         ],
-        apiKey: str = Form(...),
-        modelName: str = Form(...),
-        indexName: str = Form(...),
-        environment: str = Form(...),
-        metric: str = Form(...),
+        apiKey: str ,
+        modelName: str ,
+        indexName: str,
+        environment: str,
+        metric: str,
+        authorization: str = Header(None),
         con=Depends(get_db)
 ):
+
+    try:
+        print(JWT_SECRET)
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
 
     if "DEFAULT-API-KEY" == apiKey:
         apiKey = config('PINECONE_API_KEY')
@@ -160,6 +176,193 @@ async def create_upload_files(
         #return {"filenames": [file.filename for file in files]}
         return "OK"
 
+@app.get("/pinecone/fileinfo/")
+async def fileInfo(filename: str,
+                   authorization: str = Header(None),
+                   con=Depends(get_db)):
+
+    try:
+        print(JWT_SECRET)
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
+
+    return existFile(filename, con)
+
+@app.get("/pinecone/indexinfo/")
+async def pineconeInfo(
+        apiKey: str,
+        indexName: str,
+        environment: str,
+        response: Response,
+        authorization: str = Header(None)):
+
+    try:
+        print(JWT_SECRET)
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
+
+    if "DEFAULT-API-KEY" == apiKey:
+        apiKey = config('PINECONE_API_KEY')
+    if "DEFAULT-INDEX-NAME" == indexName:
+        indexName = "keyword-search"
+    if "DEFAULT-ENVIRONMENT" == environment:
+        environment = config('PINECONE_ENVIRONMENT')
+
+    index: GRPCIndex = getIndexWithResponse(indexName, apiKey, environment, response)
+    stats: DescribeIndexStatsResponse = index.describe_index_stats()
+
+    return {"indexName": indexName,
+            "dimension": stats.dimension,
+            "index_fullness": stats.index_fullness,
+            "total_vector_count": stats.total_vector_count}
+    #return {"dimension": 0,
+    #        "index_fullness": 0,
+    #        "total_vector_count": 0}
+
+@app.get("/pinecone/listmodels")
+async def listModels(authorization: str = Header(None)):
+
+    try:
+        print(JWT_SECRET)
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
+
+    return ['all-MiniLM-L6-v2',
+            'average_word_embeddings_komninos',
+            'multi-qa-MiniLM-L6-cos-v1',
+            'bert-base-nli-mean-tokens',
+            'all_datasets_v3_mpnet-base',
+            'paraphrase-MiniLM-L6-v2',
+            'all-mpnet-base-v2',
+            'average_word_embeddings_glove.6B.300d']
+
+@app.get("/pinecone/listindexes")
+async def listIndexes(authorization: str = Header(None)):
+
+    try:
+        print(JWT_SECRET)
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
+
+    pinecone.init(api_key=config('PINECONE_API_KEY'), environment=config('PINECONE_ENVIRONMENT'))
+    return pinecone.list_indexes()
+
+@app.get("/pinecone/fetchbyid")
+def fetchById(apiKey: str,
+              indexName: str,
+              environment: str,
+              searchid:str,
+              authorization: str = Header(None)):
+
+    try:
+        print(JWT_SECRET)
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
+
+    if "DEFAULT-API-KEY" == apiKey:
+        apiKey = config('PINECONE_API_KEY')
+    if "DEFAULT-INDEX-NAME" == indexName:
+        indexName = "keyword-search"
+    if "DEFAULT-ENVIRONMENT" == environment:
+        environment = config('PINECONE_ENVIRONMENT')
+
+    index = getIndex(indexName, apiKey, environment)
+
+    result = index.fetch([searchid])
+    print(result)
+    return str(result).replace("'", "\"")
+
+@app.get("/pinecone/searchbyquery")
+def searchByQuery(
+        apiKey: str,
+        indexName: str,
+        environment: str,
+        modelName: str,
+        query: str,
+        authorization: str = Header(None)):
+
+    try:
+        print(JWT_SECRET)
+        print(authorization)
+        decoded = secure(authorization)
+        # here we can add code to check the user (by email)
+        # e.g. select the user from the DB and see its permissions
+    except:
+        return "Unauthorized Access!"
+
+    if indexName is None or indexName == "" or indexName == "undefined":
+        print("indexName cannot be empty")
+        return ""
+
+    print(query)
+    if "DEFAULT-API-KEY" == apiKey:
+        apiKey = config('PINECONE_API_KEY')
+    if "DEFAULT-MODEL-NAME" == modelName:
+        modelName = "all-MiniLM-L6-v2"
+    if "DEFAULT-INDEX-NAME" == indexName:
+        indexName = "keyword-search"
+    if "DEFAULT-ENVIRONMENT" == environment:
+        environment = config('PINECONE_ENVIRONMENT')
+
+    index = getIndex(indexName, apiKey, environment)
+
+    model = getModel(modelName)
+
+    query_questions = [
+        query
+    ]
+
+    query_vectors = [model.encode(str(question)).tolist() for question in query_questions]
+
+    # mit metadata###
+    query_results = index.query(queries=query_vectors, top_k=5, include_metadata=True)
+    #query_results = index.query(queries=query_vectors, top_k=5)
+
+    #print(str(query_results).replace("'", "\""))
+    scores = []
+    for results in query_results['results']:
+        for result in results['matches']:
+            if 'text' in result['metadata']:
+                print(f"{round(result['score'], 2)}: {result['metadata']['text']}")
+                scores.append(
+                    QueryResult(
+                        result['id'],
+                        round(result['score'], 2),
+                        result['metadata']['text']
+                    )
+                )
+            else:
+                print(f"{round(result['score'], 2)}")
+                #scores.pop()
+                #.append(geeks('Akash', 2))
+                scores.append(
+                    QueryResult(
+                        result['id'],
+                        round(result['score'], 2)
+                    )
+                )
+
+    return json.dumps(scores, indent=4, cls=QueryResultEncoder)
 
 async def handleSingleFile(apiKey, con, environment, file_location, fileName, indexName, metric, modelName):
     try:
@@ -215,7 +418,7 @@ async def handleSingleFile(apiKey, con, environment, file_location, fileName, in
             raise Exception("Unsupported Filetype: " + extension)
 
         cur = con.cursor()
-        now = datetime.datetime.now()
+        now = datetime.now()
         cur.execute("insert into files(name, ts) values (?, ?)", (fileName, now))
         con.commit()
         con.close()
@@ -224,147 +427,6 @@ async def handleSingleFile(apiKey, con, environment, file_location, fileName, in
         traceback.print_exc()
         print(e)
         raise HTTPException(status_code=500, detail='Something went wrong')
-    #finally:
-    #    file.file.close()
-
-
-@app.get("/pinecone/fileinfo/{filename}")
-async def fileInfo(filename: str, con=Depends(get_db)):
-    upload_path = config('UPLOAD_PATH')
-    #file_location = f"{upload_path}{filename}"
-    #with open(file_location, "wb+") as file_object:
-    #    file_object.read()
-    #return os.path.isfile(file_location)
-    #con = sqlite3.connect(":memory:")
-    return existFile(filename, con)
-
-
-
-@app.get("/pinecone/indexinfo/{apiKey}/{indexName}/{environment}")
-async def pineconeInfo(
-        apiKey: str,
-        indexName: str,
-        environment: str, response: Response):
-
-    if "DEFAULT-API-KEY" == apiKey:
-        apiKey = config('PINECONE_API_KEY')
-    if "DEFAULT-INDEX-NAME" == indexName:
-        indexName = "keyword-search"
-    if "DEFAULT-ENVIRONMENT" == environment:
-        environment = config('PINECONE_ENVIRONMENT')
-
-    index: GRPCIndex = getIndexWithResponse(indexName, apiKey, environment, response)
-    stats: DescribeIndexStatsResponse = index.describe_index_stats()
-
-    return {"indexName": indexName,
-            "dimension": stats.dimension,
-            "index_fullness": stats.index_fullness,
-            "total_vector_count": stats.total_vector_count}
-    #return {"dimension": 0,
-    #        "index_fullness": 0,
-    #        "total_vector_count": 0}
-
-@app.get("/pinecone/listmodels")
-async def listModels():
-    return ['all-MiniLM-L6-v2',
-            'average_word_embeddings_komninos',
-            'multi-qa-MiniLM-L6-cos-v1',
-            'bert-base-nli-mean-tokens',
-            'all_datasets_v3_mpnet-base',
-            'paraphrase-MiniLM-L6-v2',
-            'all-mpnet-base-v2',
-            'average_word_embeddings_glove.6B.300d']
-
-@app.get("/pinecone/listindexes")
-async def listIndexes():
-    pinecone.init(api_key=config('PINECONE_API_KEY'), environment=config('PINECONE_ENVIRONMENT'))
-    return pinecone.list_indexes()
-
-@app.get("/pinecone/fetchbyid")
-def fetchById(indexName:str,
-              apiKey: str,
-              environment: str,
-              searchid:str):
-
-    if "DEFAULT-API-KEY" == apiKey:
-        apiKey = config('PINECONE_API_KEY')
-    if "DEFAULT-INDEX-NAME" == indexName:
-        indexName = "keyword-search"
-    if "DEFAULT-ENVIRONMENT" == environment:
-        environment = config('PINECONE_ENVIRONMENT')
-
-    index = getIndex(indexName, apiKey, environment)
-
-    result = index.fetch([searchid])
-    print(result)
-    return str(result).replace("'", "\"")
-
-@app.get("/pinecone/searchbyquery")
-def searchByQuery(
-        indexName:str,
-        apiKey: str,
-        environment: str,
-        modelName: str,
-        query: str):
-
-    if indexName is None or indexName == "" or indexName == "undefined":
-        print("indexName cannot be empty")
-        return ""
-
-    print(query)
-    if "DEFAULT-API-KEY" == apiKey:
-        apiKey = config('PINECONE_API_KEY')
-    if "DEFAULT-MODEL-NAME" == modelName:
-        modelName = "all-MiniLM-L6-v2"
-    if "DEFAULT-INDEX-NAME" == indexName:
-        indexName = "keyword-search"
-    if "DEFAULT-ENVIRONMENT" == environment:
-        environment = config('PINECONE_ENVIRONMENT')
-
-    index = getIndex(indexName, apiKey, environment)
-
-    model = getModel(modelName)
-
-    query_questions = [
-        query
-    ]
-
-    query_vectors = [model.encode(str(question)).tolist() for question in query_questions]
-
-    # mit metadata###
-    query_results = index.query(queries=query_vectors, top_k=5, include_metadata=True)
-    #query_results = index.query(queries=query_vectors, top_k=5)
-
-    #print(str(query_results).replace("'", "\""))
-    scores = []
-    for results in query_results['results']:
-        for result in results['matches']:
-            if 'text' in result['metadata']:
-                print(f"{round(result['score'], 2)}: {result['metadata']['text']}")
-                scores.append(
-                    QueryResult(
-                        result['id'],
-                        round(result['score'], 2),
-                        result['metadata']['text']
-                    )
-                )
-            else:
-                print(f"{round(result['score'], 2)}")
-                #scores.pop()
-                #.append(geeks('Akash', 2))
-                scores.append(
-                    QueryResult(
-                        result['id'],
-                        round(result['score'], 2)
-                    )
-                )
-
-    #employeeJSONData = json.dumps(scores, indent=4, cls=QueryResultEncoder)
-    #print(employeeJSONData)
-    #return query_results
-    #return str(query_results).replace("'", "\"")
-    return json.dumps(scores, indent=4, cls=QueryResultEncoder)
-
 
 def getText(filename):
     doc = docx.Document(filename)
@@ -500,3 +562,9 @@ def translateContent(modelname: str, indexName:str, apiKey:str, environment:str,
 #    await sleep(1)
 #    print('Task', num, 'finished')
 
+def secure(token):
+    # if we want to sign/encrypt the JSON object: {"hello": "world"}, we can do it as follows
+    # encoded = jwt.encode({"hello": "world"}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    decoded_token = jwt.decode(token, JWT_SECRET, algorithms=JWT_ALGORITHM)
+    # this is often used on the client side to encode the user's email address or other properties
+    return decoded_token
