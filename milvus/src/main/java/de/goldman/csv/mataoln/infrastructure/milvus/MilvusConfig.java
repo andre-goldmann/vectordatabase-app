@@ -3,25 +3,26 @@ package de.goldman.csv.mataoln.infrastructure.milvus;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.param.ConnectParam;
 import lombok.extern.slf4j.Slf4j;
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
-import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.File;
 
 @Configuration
 @Slf4j
 public class MilvusConfig {
+
+    @Value("${milvus.host}")
+    private String milvusHost;
+
     @Bean
     MilvusServiceClient milvusClient(){
         return new MilvusServiceClient(
                 ConnectParam.newBuilder()
-                        .withHost("localhost")
+                        .withHost(milvusHost)
                         .withPort(19530)
                         .build()
         );
