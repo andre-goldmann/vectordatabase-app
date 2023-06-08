@@ -178,3 +178,6 @@ sentenceapi/.idea
 sentenceapi/.env
 pinecone/.idea
 pinecone/.env
+/pinecone/files.db
+/pinecone/uploadLebenslauf-englisch.docx
+/pinecone/uploadsvelte-succinctly.pdf
