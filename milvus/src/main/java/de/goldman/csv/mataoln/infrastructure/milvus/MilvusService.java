@@ -11,6 +11,7 @@ import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.QueryParam;
 import io.milvus.param.dml.SearchParam;
 import io.milvus.param.index.CreateIndexParam;
+import io.milvus.response.GetCollStatResponseWrapper;
 import io.milvus.response.QueryResultsWrapper;
 import io.milvus.response.SearchResultsWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -241,7 +242,7 @@ public class MilvusService {
         String searchExpr = "employees" + " > " + 50;
 
         final List<List<Float>> vectors = new ArrayList<>();
-        vectors.add(fastApiConnectController.calculateSenteceVectors(expr));
+        vectors.add(this.fastApiConnectController.calculateSenteceVectors(expr));
 
         SearchParam searchParam = SearchParam.newBuilder()
                 .withCollectionName(COLLECTION_NAME)
@@ -255,7 +256,7 @@ public class MilvusService {
                 .withGuaranteeTimestamp(Constant.GUARANTEE_EVENTUALLY_TS)
                 .build();
 
-        R<SearchResults> response = milvusClient.search(searchParam);
+        R<SearchResults> response = this.milvusClient.search(searchParam);
         long end = System.currentTimeMillis();
         long cost = (end - begin);
         log.info("Search time cost: " + cost + "ms");
@@ -273,7 +274,7 @@ public class MilvusService {
                     "employees=" + wrapper.getFieldData("employees" ,i)+
                     ", social=" + wrapper.getFieldData("social" ,i));
         }
-        milvusClient.releaseCollection(
+        this.milvusClient.releaseCollection(
                 ReleaseCollectionParam.newBuilder()
                         .withCollectionName(COLLECTION_NAME)
                         .build());
@@ -304,5 +305,23 @@ public class MilvusService {
         handleResponseStatus(response);
         System.out.println(response);
         return response.getData();
+    }
+
+    public long colletionEntryCount(final String collectionName) {
+        final R<GetCollectionStatisticsResponse> respCollectionStatistics = this.milvusClient.getCollectionStatistics(
+                // Return the statistics information of the collection.
+                GetCollectionStatisticsParam.newBuilder()
+                        .withCollectionName(collectionName)
+                        .build()
+        );
+        return new GetCollStatResponseWrapper(respCollectionStatistics.getData()).getRowCount();
+    }
+
+    public R<ShowCollectionsResponse> listCollections() {
+        R<ShowCollectionsResponse> respShowCollections = this.milvusClient.showCollections(
+                ShowCollectionsParam.newBuilder().build()
+        );
+        System.out.println(respShowCollections);
+        return respShowCollections;
     }
 }

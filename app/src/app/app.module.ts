@@ -12,20 +12,30 @@ import {HttpClientModule} from "@angular/common/http";
 import {AppConfigService} from "./services/app-config.service";
 import {PineconeService} from "./pinecone/pinecone.service";
 import { DataSearchFormComponent } from './pinecone/data-search-form/data-search-form.component';
-import {DashboardComponent} from "./pinecone/dashboard/dashboard.component";
+import {DashboardPineconeComponent} from "./pinecone/dashboard/dashboard-pinecone.component";
 import {SearchService} from "./pinecone/data-search-form/search.service";
 import { IndexConfigFormComponent } from './pinecone/index-config-form/index-config-form.component';
 import {IndexForm} from "./pinecone/index.form";
 import {LayoutModule} from "@angular/cdk/layout";
+import { MilvusComponent } from './milvus/milvus.component';
+import { DashboardMilvusComponent } from './milvus/dashboard/dashboard-milvus.component';
+import {DashboardComponent} from "./dashboard/dashboard.component";
+import { WeaviateComponent } from './weaviate/weaviate.component';
+import { QdrantComponent } from './qdrant/qdrant.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
     DashboardComponent,
+    DashboardPineconeComponent,
     DataUploadFormComponent,
     DataSearchFormComponent,
-    IndexConfigFormComponent
+    IndexConfigFormComponent,
+    MilvusComponent,
+    DashboardMilvusComponent,
+    WeaviateComponent,
+    QdrantComponent
   ],
   imports: [
     BrowserModule,

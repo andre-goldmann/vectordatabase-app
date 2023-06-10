@@ -23,18 +23,7 @@ public class FastApiConnectController {
     private String sentenceapiUrl;
 
     public List<Float> calculateSenteceVectors(final String sentence){
-//        final String fooResourceUrl
-//                = this.sentenceapiUrl + "/sentences/translator/all-MiniLM-L6-v2/text={text}";
-//
-//        final DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
-//        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
-//        final URI uri = factory.uriString(fooResourceUrl).build(sentence);
-//
-//        final ResponseEntity<Float[]> response
-//                = this.restTemplate.getForEntity(uri, Float[].class);
-//        return Arrays.asList(Objects.requireNonNull(response.getBody()));
 
-        //log.info("text={}");
         final HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.set("Authorization", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6IndvcmxkIn0.bqxXg9VwcbXKoiWtp-osd0WKPX307RjcN7EuXbdq-CE");

@@ -4,7 +4,6 @@ import com.opencsv.CSVParser;
 import de.goldman.csv.mataoln.domain.model.SiteEntity;
 import de.goldman.csv.mataoln.domain.model.SiteEntityRepository;
 import de.goldman.csv.mataoln.infrastructure.csv.LineParser;
-import de.goldman.csv.mataoln.infrastructure.milvus.LoadGoogleNewsModelWithReflection;
 import de.goldman.csv.mataoln.infrastructure.milvus.MilvusService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +20,16 @@ import static de.goldman.csv.mataoln.infrastructure.milvus.MilvusService.COLLECT
 
 @Slf4j
 @SpringBootApplication
-public class CsvMataolnApplication implements CommandLineRunner {
+public class MilvusBackendApplication implements CommandLineRunner {
 
 	@Autowired
 	private LineParser lineParser;
 
 	@Autowired
-	private SiteEntityRepository siteEntityRepository;
-
-	@Autowired
 	MilvusService milvusService;
 
 	public static void main(String[] args) {
-		SpringApplication.run(CsvMataolnApplication.class, args);
+		SpringApplication.run(MilvusBackendApplication.class, args);
 	}
 
 	@Override
@@ -47,10 +43,9 @@ public class CsvMataolnApplication implements CommandLineRunner {
 
 		this.milvusService.showCollections();
 
-		long count = this.siteEntityRepository.count();
-		if(count == 0) {
+		if(this.milvusService.colletionEntryCount(COLLECTION_NAME) > 0){
 			// TODO nicht in DB speichern sondern direkt in Milvus
-			List<String> files = List.of("All-Live-Shopify-Sites.csv", "All-Live-WooCommerce-Sites.csv");
+			final List<String> files = List.of("All-Live-Shopify-Sites.csv", "All-Live-WooCommerce-Sites.csv");
 			for (String file : files) {
 				try (FileInputStream inputStream = new FileInputStream("data/" + file); Scanner sc = new Scanner(inputStream, StandardCharsets.UTF_8)) {
 					//try (FileInputStream inputStream = new FileInputStream("data/All-Live-Shopify-Sites.csv"); Scanner sc = new Scanner(inputStream, StandardCharsets.UTF_8)) {
@@ -76,9 +71,6 @@ public class CsvMataolnApplication implements CommandLineRunner {
 					log.info(counter + " lines read!");
 				}
 			}
-		}else
-		{
-			log.info("Data allready stored!");
 		}
 
 	}
