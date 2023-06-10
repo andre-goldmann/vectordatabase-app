@@ -1,0 +1,53 @@
+<div class="grid-container">
+  <div class="dashboard-card" *ngFor="let card of cards | async" style="min-height: {{card.height}}px;">
+
+    <div *ngIf="card.title=='Pinecone'" (click)="openDbSite('pinecone')">
+      <div class="card w-96 bg-base-100 shadow-xl center" style="min-width: 500px;min-height:410px;">
+        <figure class="px-10 pt-10">
+          <img src="https://files.readme.io/186eb0a-pinecone-logo.svg" alt="Pinecone" class="rounded-xl" style="width: 200px;height: 80px;"/>
+        </figure>
+        <div class="card-body items-center text-center">
+          <p>The Pinecone vector database makes it easy to build high-performance vector search applications. Use Cohere to generate language embeddings, then store them in Pinecone and use them for Semantic Search.</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="card.title=='Milvus'" (click)="openDbSite('milvus')">
+      <div class="card w-96 bg-base-100 shadow-xl center" style="min-width: 500px;min-height:410px;">
+        <figure class="px-10 pt-10">
+          <img src="https://files.readme.io/f4f6d26-Milvus_Logo_Official.png" alt="Milvus" class="rounded-xl"
+          style="width: 200px; height: 120px;"/>
+        </figure>
+        <div class="card-body items-center text-center">
+          <p>Milvus is a highly flexible, reliable, and blazing-fast cloud-native, open-source vector database. It powers embedding similarity search and AI applications and strives to make vector databases accessible to every organization. Milvus is a graduated-stage project of the LF AI & Data Foundation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="card.title=='Weaviate'" (click)="openDbSite('weaviate')">
+      <div class="card w-96 bg-base-100 shadow-xl center" style="min-width: 500px;min-height:410px;">
+        <figure class="px-10 pt-10">
+          <img src="https://files.readme.io/c94ff90-weaviate-logo.png" alt="Weaviate" class="rounded-xl" style="width: 200px; height: 120px;"/>
+        </figure>
+        <div class="card-body items-center text-center">
+          <p>Weaviate is an open source vector search engine that stores both objects and vectors, allowing for combining vector search with structured filtering.
+
+            The text2vec-cohere module allows you to use Cohere embeddings directly in the Weaviate vector search engine as a vectorization module.</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="card.title=='Qdrant'" (click)="openDbSite('qdrant')">
+      <div class="card w-96 bg-base-100 shadow-xl center" style="min-width: 500px;min-height:410px;">
+        <figure class="px-10 pt-10">
+          <img src="https://files.readme.io/967397c-logo_with_text.png" alt="Qdrant" class="rounded-xl" style="width: 200px;"/>
+        </figure>
+        <div class="card-body items-center text-center">
+          <p>Qdrant is an open-source vector similarity search engine and vector database. It provides a production-ready service with a convenient API to store, search, and manage points - vectors with an additional payload. Qdrant is tailored to extended filtering support. It makes it useful for all sorts of neural-network or semantic-based matching, faceted search, and other applications.
+
+            Qdrant is written in Rust, which makes it fast and reliable even under high load.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

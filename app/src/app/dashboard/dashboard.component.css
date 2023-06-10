@@ -1,0 +1,15 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-container > div {
+  text-align: center;
+}
+
+.center {
+  cursor: pointer;
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
