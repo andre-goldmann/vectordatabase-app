@@ -7,6 +7,9 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 import os
 from dotenv import load_dotenv
+import whisper
+from langdetect import detect
+from pytube import YouTube
 
 load_dotenv()
 
@@ -60,6 +63,45 @@ def splitText(text: str, authorization: str = Header(None)):
 
     return text_splitter.split_text('\n'.join(text))
 
+@app.get("/youtubetotext/")
+def youtubeToText(url: str):
+
+    # try:
+    #     print(authorization)
+    #     decoded = secure(authorization)
+    #     # here we can add code to check the user (by email)
+    #     # e.g. select the user from the DB and see its permissions
+    # except:
+    #     return "Unauthorized Access!"
+
+    # Create a YouTube object from the URL
+    yt = YouTube(url)
+
+    # Get the audio stream
+    audio_stream = yt.streams.filter(only_audio=True).first()
+
+    # Download the audio stream
+    output_path = "YoutubeAudios"
+    filename = "audio.mp3"
+    audio_stream.download(output_path=output_path, filename=filename)
+
+    print(f"Audio downloaded to {output_path}/{filename}")
+
+    # Load the base model and transcribe the audio
+    model = whisper.load_model("base")
+    #result = model.transcribe("YoutubeAudios/audio.mp3")
+    result = model.transcribe({output_path}/{filename})
+    transcribed_text = result["text"]
+    print(transcribed_text)
+
+    # Detect the language
+    language = detect(transcribed_text)
+    #print(f"Detected language: {language}")
+
+    # Create and open a txt file with the text
+    #create_and_open_txt(transcribed_text, f"output_{language}.txt")
+
+    return transcribed_text
 
 def getModel(modelname):
     if 'all-MiniLM-L6-v2' == modelname:
