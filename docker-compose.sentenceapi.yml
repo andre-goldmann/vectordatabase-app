@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+
+  # Security, do we need to secure this?
+  # yes we need if we are going to use pinecone/openai here
+  #https://testdriven.io/blog/fastapi-jwt-auth/
+  #https://dev.to/spaceofmiah/implementing-authorization-in-fastapi-a-step-by-step-guide-for-securing-your-web-applications-3b1l
+  #https://github: com/testdrivenio/fastapi-docker-traefik:
+  sentenceapi:
+    container_name: sentence-api-server
+    build: ./sentenceapi
+    ports:
+      - "6081:6081"
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/sentenceapi:/var/lib/sentenceapi
+    env_file:
+      - variables.env
+
+networks:
+  default:
+    name: milvus
