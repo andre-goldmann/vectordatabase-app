@@ -4,6 +4,8 @@ WORKDIR /code
 
 COPY ./requirements.txt /code/requirements.txt
 
+RUN apt install ffmpeg
+RUN apt-get install python3-bs4
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 #
