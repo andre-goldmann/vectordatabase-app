@@ -1,10 +1,11 @@
 FROM python:3.9
+FROM jrottenberg/ffmpeg
 
 WORKDIR /code
 
 COPY ./requirements.txt /code/requirements.txt
 
-RUN apt-get install ffmpeg
+#RUN apt install ffmpeg
 #RUN apt-get install python3-bs4
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
